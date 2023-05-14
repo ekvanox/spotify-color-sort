@@ -7,7 +7,7 @@
 
 Spotify Color Sort is a script that sorts your Spotify playlists based on the dominant color of the album covers. It uses the Spotify API to interact with your playlists and downloads album covers, and then reorders the songs based on the color of their album covers.
 
-![Example - Before/After](https://github.com/ekvanox/spotify-color-sort/blob/master/media/before-after.jpg)
+![Example - Before/After](https://github.com/ekvanox/spotify-color-sort/blob/master/media/before-after.png)
 
 ## Requirements
 
