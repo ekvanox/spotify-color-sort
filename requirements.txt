@@ -1,0 +1,16 @@
+async-timeout==4.0.2
+certifi==2023.5.7
+charset-normalizer==3.1.0
+colorama==0.4.6
+colorthief==0.2.1
+idna==3.4
+Pillow==9.5.0
+prompt-toolkit==3.0.38
+questionary==1.10.0
+redis==4.5.5
+requests==2.30.0
+six==1.16.0
+spotipy==2.23.0
+tqdm==4.65.0
+urllib3==2.0.2
+wcwidth==0.2.6
