@@ -9,6 +9,8 @@ Spotify Color Sort is a script that sorts your Spotify playlists based on the do
 
 ![Example - Before/After](https://github.com/ekvanox/spotify-color-sort/blob/master/media/before-after.png)
 
+*Note: Results get significantly better as the playlist size increases*
+
 ## Requirements
 
 - Python 3
@@ -29,8 +31,6 @@ Spotify Color Sort operates by interfacing with the Spotify API and extracting k
 5. **Reordering Playlist**: Finally, the script reorders the songs in the playlist based on the sorted color values.
 
 ### Limitations
-
-The algorithm has a few limitations:
 
 - **Color Perception**: While the script sorts songs based on the average color of their album covers, this might not always correspond to the perceived "dominant" color of an album cover due to the complex ways in which humans perceive color.
 
