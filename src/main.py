@@ -1,51 +1,61 @@
-import os
-import requests
-import colorsys
-from tqdm import tqdm
+import logging
 from pathlib import Path
-from PIL import Image, ImageStat
-import spotipy
-from spotipy.oauth2 import SpotifyOAuth
+import requests
+from tqdm import tqdm
 import questionary
+import colorsys
+from spotify import sp, get_user_data_and_playlists
+from image_processing import get_average_color
+import coloredlogs
+from time import time
 
-def get_average_color(image_path):
-    """Get the average color of the image."""
-    try:
-        img = Image.open(image_path)
-        if img.mode != 'RGB':
-            img = img.convert('RGB')
-        stat = ImageStat.Stat(img)
-        r,g,b = stat.mean
-        return r,g,b
-    except Exception as e:
-        print(f"Warning: Failed to open or process the image {image_path}. Error: {e}")
-        return 0, 0, 0  # Return black if there is an error processing the image
+logger = logging.getLogger()
+logger.disabled = True
+logger = logging.getLogger(__name__)
 
-
-# Spotify and environment setup
-client_id = os.getenv('SPOTIFY_CLIENT_ID')
-client_secret = os.getenv('SPOTIFY_CLIENT_SECRET')
-redirect_uri='http://localhost:8080'
-scope = 'playlist-read-private playlist-read-collaborative playlist-modify-public playlist-modify-private'
-
-if not all([client_id, client_secret]):
-    raise ValueError("Please set the SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET in the environment")
-
-sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=client_id, client_secret=client_secret, redirect_uri=redirect_uri, scope=scope))
+# Setup logging
+coloredlogs.install(
+    level=20,
+    fmt="[%(levelname)s] %(asctime)s: %(message)s",
+    level_styles={
+        "critical": {"bold": True, "color": "red"},
+        "debug": {"color": "green"},
+        "error": {"color": "red"},
+        "info": {"color": "white"},
+        "notice": {"color": "magenta"},
+        "spam": {"color": "green", "faint": True},
+        "success": {"bold": True, "color": "green"},
+        "verbose": {"color": "blue"},
+        "warning": {"color": "yellow"},
+    },
+    logger=logger,
+    field_styles={
+        "asctime": {"color": "cyan"},
+        "levelname": {"bold": True, "color": "black"},
+    },
+)
 
 # Get user data and playlists
-user = sp.current_user()
-response = sp.current_user_playlists(limit=50)
-user_playlists = [p for p in response['items'] if p['owner']['id'] == user['id']]
+user, user_playlists = get_user_data_and_playlists()
 
-# User playlist selection
-answers = questionary.checkbox('Please select the playlists to sort:', choices=[f"{i}: {p['name']}" for i, p in enumerate(user_playlists, 1)]).ask()
+# Create a list of choices for the user to select from.
+# Each choice is a string that contains the index and name of a playlist.
+choices = [f"{i}: {p['name']}" for i, p in enumerate(user_playlists, 1)]
+
+# Ask the user to select from the list of choices.
+# The selected choices will be stored in the 'answers' variable.
+answers = questionary.checkbox(
+    'Please select the playlists to sort:',
+    choices=choices
+).ask()
 selected_playlists = [user_playlists[int(answer.split(':')[0])-1] for answer in answers]
+
+# Start timer to calculate the playlist sorting time
+start_time = time()
 
 # Get all song album cover urls from selected playlists and process each playlist
 for selected_playlist in selected_playlists:
-    playlist_name = selected_playlist.split(':')[1]
-    print('Processing: ', playlist_name)
+    logger.info(f'Processing playlist: {selected_playlist["name"]}')
 
     songs = []
     image_urls = []
@@ -87,3 +97,8 @@ for selected_playlist in selected_playlists:
             sp.playlist_reorder_items(selected_playlist['id'], range_start=current_position, insert_before=insert_position)
             song_ids.insert(insert_position, song_ids.pop(current_position))
         insert_position += 1
+
+if (num_playlists := len(selected_playlists)):
+    logger.info(f'{num_playlists} playlist(s) sorted in {time() - start_time:.1f}s')
+else:
+    logger.error('No playlists selected, exiting...')
