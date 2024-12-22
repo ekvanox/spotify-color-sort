@@ -9,7 +9,16 @@ redirect_uri='http://localhost:8080'
 scope = 'playlist-read-private playlist-read-collaborative playlist-modify-public playlist-modify-private'
 
 if not all([client_id, client_secret]):
-    raise ValueError("Please set the SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET in the environment")
+    raise ValueError(
+        "Missing Spotify API credentials. Please set SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET environment variables.\n"
+        "You can obtain these credentials by:\n"
+        "1. Visit https://developer.spotify.com/dashboard\n"
+        "2. Create a new app\n"
+        "3. Copy the Client ID and Client Secret\n"
+        "4. Set them as environment variables:\n"
+        "   export SPOTIFY_CLIENT_ID='your-client-id'\n"
+        "   export SPOTIFY_CLIENT_SECRET='your-client-secret'"
+    )
 
 sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=client_id, client_secret=client_secret, redirect_uri=redirect_uri, scope=scope))
 

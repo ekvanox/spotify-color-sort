@@ -35,8 +35,12 @@ coloredlogs.install(
     },
 )
 
-# Get user data and playlists
-user, user_playlists = get_user_data_and_playlists()
+try:
+    # Get user data and playlists
+    user, user_playlists = get_user_data_and_playlists()
+except ValueError as e:
+    logger.error(str(e))
+    exit(1)
 
 # Create a list of choices for the user to select from.
 # Each choice is a string that contains the index and name of a playlist.
