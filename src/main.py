@@ -3,9 +3,8 @@ from pathlib import Path
 import requests
 from tqdm import tqdm
 import questionary
-import colorsys
 from spotify import sp, get_user_data_and_playlists
-from image_processing import get_average_color
+from image_processing import get_average_color, get_sort_key
 import coloredlogs
 from time import time
 
@@ -83,12 +82,13 @@ for selected_playlist in selected_playlists:
             with open(image_path, 'wb') as f:
                 f.write(response.content)
 
-        # Get average color
-        primary_color = get_average_color(image_path)
-        colors.append([song_id, primary_color])
+        # Get color data
+        color_data = get_average_color(image_path)
+        colors.append([song_id, color_data])
 
-    # Apply HSV sorting to colors and reorder songs
-    colors.sort(key=lambda item: colorsys.rgb_to_hsv(*item[1]))
+    # Sort using the new color approach
+    colors.sort(key=lambda item: get_sort_key(item[1]))
+
     song_ids = [song['track']['id'] for song in songs]
     new_order = [song_id for song_id, _ in colors[::-1]]
     song_ids_order = {song_id: i for i, song_id in enumerate(new_order)}
