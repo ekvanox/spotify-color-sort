@@ -2,7 +2,9 @@ async-timeout==4.0.2
 certifi==2023.5.7
 charset-normalizer==3.1.0
 colorama==0.4.6
+coloredlogs==15.0.1
 colorthief==0.2.1
+humanfriendly==10.0
 idna==3.4
 Pillow==9.5.0
 prompt-toolkit==3.0.38
